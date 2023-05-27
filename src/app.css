@@ -1,0 +1,9 @@
+.tilesContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.tileRow {
+    display: flex;
+    flex-direction: row;
+}
