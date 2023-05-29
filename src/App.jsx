@@ -13,9 +13,9 @@ function App() {
   // 3 is the end node.
   const [tilesMap, setTilesMap] = useState([
     [0, 0, 3, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 0],
+    [0, 1, 1, 1, 0],
+    [0, 1, 0, 1, 0],
+    [0, 1, 1, 2, 0],
     [0, 0, 0, 0, 0],
   ]);
 
@@ -38,20 +38,25 @@ function App() {
     return across * (dx + dy) + (diagonal - 2 * across) * Math.min(dx, dy);
   }
 
-  function findNeighbours(startRow, startIndex, endRow, endIndex) {
+  function findNeighbours(row, index) {
     // Lets say i have 3,3
     // I need to get 2,2 | 2,3 | 2,4
     // I need to get 3,2 | 3,4
     // I need to get 4,2 | 4,3 | 4,4
-    const neighboursScores = [];
     // Calculate G cost (distance from starting node)
     // Calculate H cost (distance from end node)
     // Calculate F cost (G + H)
+    const topNeighbours = tilesMap[row - 1].slice(index - 1, index + 2);
+    const leftNeighbour = tilesMap[row][index - 1];
+    const rightNeighbour = tilesMap[row][index + 1];
+    const bottomNeighbours = tilesMap[row + 1].slice(index - 1, index + 2);
+    const neighboursScores = [...topNeighbours, leftNeighbour, rightNeighbour, ...bottomNeighbours];
+    console.log(neighboursScores);
   }
 
-  console.log(findNeighbours(3, 3, 4, 4));
+  console.log(findNeighbours(2, 2));
 
-  console.log(heuristic(4, 4, 1, 1));
+  // console.log(heuristic(4, 4, 1, 1));
 
   return (
     <>
