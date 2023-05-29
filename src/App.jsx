@@ -5,15 +5,16 @@ function App() {
   const height = 50;
   const width = 50;
 
-  const colors = { 0: "#fff", 1: "#000", 2: "#0091f7", 3: "#2c27d1" };
+  const colors = { 0: "#fff", 1: "#000", 2: "#0091f7", 3: "#2c27d1", 5: "#cf0000" };
 
-  const goalTile = {row: 0, index: 0};
-  const startTile = {row: 3, index: 3};
-  
+  const goalTile = { row: 0, index: 0 };
+  const startTile = { row: 3, index: 3 };
+
   // 0 is a empty tile.
   // 1 is a wall tile.
   // 2 is the start node.
   // 3 is the end node.
+  // 5 is the path it took.
   const [tilesMap, setTilesMap] = useState([
     [3, 0, 0, 0, 0],
     [0, 0, 0, 0, 0],
@@ -23,10 +24,7 @@ function App() {
   ]);
 
   function isNotBlocked(targetNumber) {
-    if (
-      targetNumber !== 1 &&
-      targetNumber !== 2
-    ) {
+    if (targetNumber !== 1 && targetNumber !== 2) {
       return true;
     } else {
       return false;
@@ -51,26 +49,64 @@ function App() {
     // Calculate H cost (distance from end node)
     // Calculate F cost (G + H)
     let topNeighbours = [];
-    const leftNeighbour = {row: row, index: index - 1, tile: tilesMap[row][index - 1]};
-    const rightNeighbour = {row: row, index: index + 1, tile: tilesMap[row][index + 1]};
+    const leftNeighbour = {
+      row: row,
+      index: index - 1,
+      tile: tilesMap[row][index - 1],
+    };
+    const rightNeighbour = {
+      row: row,
+      index: index + 1,
+      tile: tilesMap[row][index + 1],
+    };
     let bottomNeighbours = [];
     // Idk how i figured this out but i did
     // For top neighbors
-    tilesMap[row - 1].map((tile, tileIdx) => {[index - 1, index, index + 1].includes(tileIdx) ? topNeighbours.push({row: index - 1, index: tileIdx, tile: tile}) : ""})
+    tilesMap[row - 1].map((tile, tileIdx) => {
+      [index - 1, index, index + 1].includes(tileIdx)
+        ? topNeighbours.push({ row: index - 1, index: tileIdx, tile: tile })
+        : "";
+    });
     // For bottom neighbors
-    tilesMap[row + 1].map((tile, tileIdx) => {[index - 1, index, index + 1].includes(tileIdx) ? bottomNeighbours.push({row: index + 1, index: tileIdx, tile: tile}) : ""})
-    const neighbours = [...topNeighbours, leftNeighbour, rightNeighbour, ...bottomNeighbours];
+    tilesMap[row + 1].map((tile, tileIdx) => {
+      [index - 1, index, index + 1].includes(tileIdx)
+        ? bottomNeighbours.push({ row: index + 1, index: tileIdx, tile: tile })
+        : "";
+    });
+    const neighbours = [
+      ...topNeighbours,
+      leftNeighbour,
+      rightNeighbour,
+      ...bottomNeighbours,
+    ];
     neighbours.forEach((neighbour, neighbourIndex) => {
       const isAvailable = isNotBlocked(neighbour?.tile);
       if (isAvailable) {
-        const Gcost = heuristic(neighbour?.row, neighbour?.index, startTile.row, startTile.index);
-        const Hcost = heuristic(neighbour?.row, neighbour?.index, goalTile.row, goalTile.index);
+        const Gcost = heuristic(
+          neighbour?.row,
+          neighbour?.index,
+          startTile.row,
+          startTile.index
+        );
+        const Hcost = heuristic(
+          neighbour?.row,
+          neighbour?.index,
+          goalTile.row,
+          goalTile.index
+        );
         const Fcost = Gcost + Hcost;
-        tilesCosts.push({row: neighbour?.row, index: neighbour?.index, g: Gcost, h: Hcost});
+        tilesCosts.push({
+          row: neighbour?.row,
+          index: neighbour?.index,
+          g: Gcost,
+          h: Hcost,
+        });
       }
-    })
+    });
     return tilesCosts;
   }
+
+  function AStarAlgorithm() {}
 
   console.log(findNeighbours(3, 3));
 
