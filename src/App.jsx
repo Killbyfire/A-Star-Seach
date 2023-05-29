@@ -7,22 +7,25 @@ function App() {
 
   const colors = { 0: "#fff", 1: "#000", 2: "#0091f7", 3: "#2c27d1" };
 
+  const goalTile = {row: 0, index: 0};
+  const startTile = {row: 3, index: 3};
+  
   // 0 is a empty tile.
   // 1 is a wall tile.
   // 2 is the start node.
   // 3 is the end node.
   const [tilesMap, setTilesMap] = useState([
-    [0, 0, 3, 0, 0],
-    [0, 1, 1, 1, 0],
-    [0, 1, 0, 1, 0],
-    [0, 1, 1, 2, 0],
+    [3, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 0],
     [0, 0, 0, 0, 0],
   ]);
 
-  function isNotBlocked(targetRow, targetIndex) {
+  function isNotBlocked(targetNumber) {
     if (
-      tilesMap[targetRow][targetIndex] !== 1 &&
-      tilesMap[targetIndex][targetIndex] !== 2
+      targetNumber !== 1 &&
+      targetNumber !== 2
     ) {
       return true;
     } else {
@@ -39,6 +42,7 @@ function App() {
   }
 
   function findNeighbours(row, index) {
+    let tilesCosts = [];
     // Lets say i have 3,3
     // I need to get 2,2 | 2,3 | 2,4
     // I need to get 3,2 | 3,4
@@ -46,15 +50,29 @@ function App() {
     // Calculate G cost (distance from starting node)
     // Calculate H cost (distance from end node)
     // Calculate F cost (G + H)
-    const topNeighbours = tilesMap[row - 1].slice(index - 1, index + 2);
-    const leftNeighbour = tilesMap[row][index - 1];
-    const rightNeighbour = tilesMap[row][index + 1];
-    const bottomNeighbours = tilesMap[row + 1].slice(index - 1, index + 2);
-    const neighboursScores = [...topNeighbours, leftNeighbour, rightNeighbour, ...bottomNeighbours];
-    console.log(neighboursScores);
+    let topNeighbours = [];
+    const leftNeighbour = {row: row, index: index - 1, tile: tilesMap[row][index - 1]};
+    const rightNeighbour = {row: row, index: index + 1, tile: tilesMap[row][index + 1]};
+    let bottomNeighbours = [];
+    // Idk how i figured this out but i did
+    // For top neighbors
+    tilesMap[row - 1].map((tile, tileIdx) => {[index - 1, index, index + 1].includes(tileIdx) ? topNeighbours.push({row: index - 1, index: tileIdx, tile: tile}) : ""})
+    // For bottom neighbors
+    tilesMap[row + 1].map((tile, tileIdx) => {[index - 1, index, index + 1].includes(tileIdx) ? bottomNeighbours.push({row: index + 1, index: tileIdx, tile: tile}) : ""})
+    const neighbours = [...topNeighbours, leftNeighbour, rightNeighbour, ...bottomNeighbours];
+    neighbours.forEach((neighbour, neighbourIndex) => {
+      const isAvailable = isNotBlocked(neighbour?.tile);
+      if (isAvailable) {
+        const Gcost = heuristic(neighbour?.row, neighbour?.index, startTile.row, startTile.index);
+        const Hcost = heuristic(neighbour?.row, neighbour?.index, goalTile.row, goalTile.index);
+        const Fcost = Gcost + Hcost;
+        tilesCosts.push({row: neighbour?.row, index: neighbour?.index, g: Gcost, h: Hcost});
+      }
+    })
+    return tilesCosts;
   }
 
-  console.log(findNeighbours(2, 2));
+  console.log(findNeighbours(3, 3));
 
   // console.log(heuristic(4, 4, 1, 1));
 
