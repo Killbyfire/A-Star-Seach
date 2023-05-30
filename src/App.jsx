@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
@@ -12,6 +12,7 @@ function App() {
     3: "#2c27d1",
     4: "#0091f7",
     5: "#cf0000",
+    6: "#43a047",
   };
 
   const goalTile = { row: 0, index: 0 };
@@ -23,6 +24,7 @@ function App() {
   // 3 is the end node.
   // 4 is final path
   // 5 is the path it took.
+  // ? 6 is neighbour?
   const [tilesMap, setTilesMap] = useState([
     [3, 0, 0, 0, 0],
     [0, 0, 0, 0, 0],
@@ -108,9 +110,34 @@ function App() {
     return tilesCosts;
   }
 
-  async function Algorithm() {
+  // function Algorithm() {
+  //   let currentPosition = startTile;
+  //   for (let i = 0; i < tilesMap.length * tilesMap[0].length; i++) {
+  //     let tiles = findNeighbours(currentPosition.row, currentPosition.index);
+  //     let tileCosts = tiles.map((tile) => {
+  //       return tile.f;
+  //     });
+  //     let lowestTileCost = Math.min(...tileCosts);
+  //     let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
+  //     currentPosition = { row: lowestTile.row, index: lowestTile.index };
+  //     tilesMap[lowestTile.row][lowestTile.index] = 5;
+  //     if (
+  //       currentPosition.row == goalTile.row &&
+  //       currentPosition.index == goalTile.index
+  //     ) {
+  //       tilesMap.map((tileRow, RowIndex) => {
+  //         tileRow.map((tile, idx) => {
+  //           if (tile == 5) {
+  //             tilesMap[RowIndex][idx] = 4;
+  //           }
+  //         });
+  //       });
+  //       break;
+  //     }
+  //  }
+  function Algorithm() {
     let currentPosition = startTile;
-    for (let i = 0; i < (tilesMap.length * tilesMap[0].length); i++) {
+    const algorithmLoop = setInterval(() => {
       let tiles = findNeighbours(currentPosition.row, currentPosition.index);
       let tileCosts = tiles.map((tile) => {
         return tile.f;
@@ -118,7 +145,10 @@ function App() {
       let lowestTileCost = Math.min(...tileCosts);
       let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
       currentPosition = { row: lowestTile.row, index: lowestTile.index };
-      tilesMap[lowestTile.row][lowestTile.index] = 5;
+      console.log(currentPosition);
+      const newTileMap = [...tilesMap];
+      newTileMap[lowestTile.row][lowestTile.index] = 5;
+      setTilesMap(newTileMap);
       if (
         currentPosition.row == goalTile.row &&
         currentPosition.index == goalTile.index
@@ -128,21 +158,16 @@ function App() {
             if (tile == 5) {
               tilesMap[RowIndex][idx] = 4;
             }
-          })
-        })
-        break;
+          });
+        });
+        clearInterval(algorithmLoop);
       }
-    }
-    // for (let i = 0; i < (tilesMap.length * tilesMap[0].length); i++) {
-    //   findNeighbours();
-    //   console.log()
-    // }
+    }, 1000);
   }
 
-  Algorithm();
-  // console.log(findNeighbours(3, 3));
-
-  // console.log(heuristic(4, 4, 1, 1));
+  useEffect(() => {
+    Algorithm();
+  }, [])
 
   return (
     <>
