@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
+  // TODO add user controls
   const height = 50;
   const width = 50;
 
@@ -15,8 +16,8 @@ function App() {
     6: "#43a047",
   };
 
-  const goalTile = { row: 0, index: 0 };
-  const startTile = { row: 3, index: 3 };
+  const goalTile = { row: 1, index: 0 };
+  const startTile = { row: 4, index: 4 };
 
   // 0 is a empty tile.
   // 1 is a wall tile.
@@ -26,11 +27,11 @@ function App() {
   // 5 is the path it took.
   // ? 6 is neighbour?
   const [tilesMap, setTilesMap] = useState([
+    [0, 0, 0, 0, 0],
     [3, 0, 0, 0, 0],
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0],
-    [0, 0, 0, 2, 0],
-    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 2],
   ]);
 
   function isNotBlocked(targetNumber) {
@@ -65,17 +66,25 @@ function App() {
     let bottomNeighbours = [];
     // Idk how i figured this out but i did
     // For top neighbors
-    tilesMap[row - 1].map((tile, tileIdx) => {
-      [index - 1, index, index + 1].includes(tileIdx)
-        ? topNeighbours.push({ row: index - 1, index: tileIdx, tile: tile })
-        : "";
-    });
+    if (typeof tilesMap[row - 1] !== "undefined") {
+      tilesMap[row - 1].map((tile, tileIdx) => {
+        [index - 1, index, index + 1].includes(tileIdx)
+          ? topNeighbours.push({ row: index - 1, index: tileIdx, tile: tile })
+          : "";
+      });
+    }
     // For bottom neighbors
-    tilesMap[row + 1].map((tile, tileIdx) => {
-      [index - 1, index, index + 1].includes(tileIdx)
-        ? bottomNeighbours.push({ row: index + 1, index: tileIdx, tile: tile })
-        : "";
-    });
+    if (typeof tilesMap[row + 1] !== "undefined") {
+      tilesMap[row + 1].map((tile, tileIdx) => {
+        [index - 1, index, index + 1].includes(tileIdx)
+          ? bottomNeighbours.push({
+              row: index + 1,
+              index: tileIdx,
+              tile: tile,
+            })
+          : "";
+      });
+    }
     const neighbours = [
       ...topNeighbours,
       leftNeighbour,
@@ -110,31 +119,6 @@ function App() {
     return tilesCosts;
   }
 
-  // function Algorithm() {
-  //   let currentPosition = startTile;
-  //   for (let i = 0; i < tilesMap.length * tilesMap[0].length; i++) {
-  //     let tiles = findNeighbours(currentPosition.row, currentPosition.index);
-  //     let tileCosts = tiles.map((tile) => {
-  //       return tile.f;
-  //     });
-  //     let lowestTileCost = Math.min(...tileCosts);
-  //     let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
-  //     currentPosition = { row: lowestTile.row, index: lowestTile.index };
-  //     tilesMap[lowestTile.row][lowestTile.index] = 5;
-  //     if (
-  //       currentPosition.row == goalTile.row &&
-  //       currentPosition.index == goalTile.index
-  //     ) {
-  //       tilesMap.map((tileRow, RowIndex) => {
-  //         tileRow.map((tile, idx) => {
-  //           if (tile == 5) {
-  //             tilesMap[RowIndex][idx] = 4;
-  //           }
-  //         });
-  //       });
-  //       break;
-  //     }
-  //  }
   function Algorithm() {
     let currentPosition = startTile;
     const algorithmLoop = setInterval(() => {
@@ -145,7 +129,6 @@ function App() {
       let lowestTileCost = Math.min(...tileCosts);
       let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
       currentPosition = { row: lowestTile.row, index: lowestTile.index };
-      console.log(currentPosition);
       const newTileMap = [...tilesMap];
       newTileMap[lowestTile.row][lowestTile.index] = 5;
       setTilesMap(newTileMap);
@@ -167,7 +150,7 @@ function App() {
 
   useEffect(() => {
     Algorithm();
-  }, [])
+  }, []);
 
   return (
     <>
