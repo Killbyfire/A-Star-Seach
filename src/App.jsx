@@ -41,13 +41,6 @@ function App() {
 
   function findNeighbours(row, index) {
     let tilesCosts = [];
-    // Lets say i have 3,3
-    // I need to get 2,2 | 2,3 | 2,4
-    // I need to get 3,2 | 3,4
-    // I need to get 4,2 | 4,3 | 4,4
-    // Calculate G cost (distance from starting node)
-    // Calculate H cost (distance from end node)
-    // Calculate F cost (G + H)
     let topNeighbours = [];
     const leftNeighbour = {
       row: row,
@@ -100,15 +93,33 @@ function App() {
           index: neighbour?.index,
           g: Gcost,
           h: Hcost,
+          f: Fcost
         });
       }
     });
     return tilesCosts;
   }
 
-  function AStarAlgorithm() {}
+  function Algorithm() {
+    let currentPosition = {row: 2, index: 2};
+    let tiles = findNeighbours(currentPosition.row, currentPosition.index);
+    let tileCosts = tiles.map(tile => {return tile.f});
+    let lowestTileCost = Math.min(...tileCosts);
+    let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
+    currentPosition = {row: lowestTile.row, index: lowestTile.index}
+    tilesMap[lowestTile.row][lowestTile.index] = 5;
+    if (currentPosition.row == goalTile.row && currentPosition.index == goalTile.index) {
+      // TODO Find every 5 and turn them blue;
+      // alert("win")
+    }
+    // for (let i = 0; i < (tilesMap.length * tilesMap[0].length); i++) {
+    //   findNeighbours();
+    //   console.log()
+    // }
+  }
 
-  console.log(findNeighbours(3, 3));
+  Algorithm();
+  // console.log(findNeighbours(3, 3));
 
   // console.log(heuristic(4, 4, 1, 1));
 
