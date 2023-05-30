@@ -5,7 +5,14 @@ function App() {
   const height = 50;
   const width = 50;
 
-  const colors = { 0: "#fff", 1: "#000", 2: "#0091f7", 3: "#2c27d1", 5: "#cf0000" };
+  const colors = {
+    0: "#fff",
+    1: "#000",
+    2: "#0091f7",
+    3: "#2c27d1",
+    4: "#0091f7",
+    5: "#cf0000",
+  };
 
   const goalTile = { row: 0, index: 0 };
   const startTile = { row: 3, index: 3 };
@@ -14,6 +21,7 @@ function App() {
   // 1 is a wall tile.
   // 2 is the start node.
   // 3 is the end node.
+  // 4 is final path
   // 5 is the path it took.
   const [tilesMap, setTilesMap] = useState([
     [3, 0, 0, 0, 0],
@@ -93,24 +101,37 @@ function App() {
           index: neighbour?.index,
           g: Gcost,
           h: Hcost,
-          f: Fcost
+          f: Fcost,
         });
       }
     });
     return tilesCosts;
   }
 
-  function Algorithm() {
-    let currentPosition = {row: 2, index: 2};
-    let tiles = findNeighbours(currentPosition.row, currentPosition.index);
-    let tileCosts = tiles.map(tile => {return tile.f});
-    let lowestTileCost = Math.min(...tileCosts);
-    let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
-    currentPosition = {row: lowestTile.row, index: lowestTile.index}
-    tilesMap[lowestTile.row][lowestTile.index] = 5;
-    if (currentPosition.row == goalTile.row && currentPosition.index == goalTile.index) {
-      // TODO Find every 5 and turn them blue;
-      // alert("win")
+  async function Algorithm() {
+    let currentPosition = startTile;
+    for (let i = 0; i < (tilesMap.length * tilesMap[0].length); i++) {
+      let tiles = findNeighbours(currentPosition.row, currentPosition.index);
+      let tileCosts = tiles.map((tile) => {
+        return tile.f;
+      });
+      let lowestTileCost = Math.min(...tileCosts);
+      let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
+      currentPosition = { row: lowestTile.row, index: lowestTile.index };
+      tilesMap[lowestTile.row][lowestTile.index] = 5;
+      if (
+        currentPosition.row == goalTile.row &&
+        currentPosition.index == goalTile.index
+      ) {
+        tilesMap.map((tileRow, RowIndex) => {
+          tileRow.map((tile, idx) => {
+            if (tile == 5) {
+              tilesMap[RowIndex][idx] = 4;
+            }
+          })
+        })
+        break;
+      }
     }
     // for (let i = 0; i < (tilesMap.length * tilesMap[0].length); i++) {
     //   findNeighbours();
