@@ -16,8 +16,8 @@ function App() {
     6: "#43a047",
   };
 
-  const goalTile = { row: 1, index: 0 };
-  const startTile = { row: 4, index: 4 };
+  const [selectedTool, setSelectedTool] = useState("empty");
+  const [AlgorithmWorking, setAlgorithmWorking] = useState(false);
 
   // 0 is a empty tile.
   // 1 is a wall tile.
@@ -26,6 +26,8 @@ function App() {
   // 4 is final path
   // 5 is the path it took.
   // ? 6 is neighbour?
+  const goalTile = { row: 1, index: 0 };
+  const startTile = { row: 4, index: 4 };
   const [tilesMap, setTilesMap] = useState([
     [0, 0, 0, 0, 0],
     [3, 0, 0, 0, 0],
@@ -33,6 +35,18 @@ function App() {
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 2],
   ]);
+
+  function GenerateTileMap(rows, columns) {
+    let newTileMap = [];
+    for (let i = 0; i < rows; i++) {
+      let tileRow = [];
+      for (let j = 0; j < columns; j++) {
+        tileRow.push(0);
+      }
+      newTileMap.push(tileRow);
+    }
+    setTilesMap(newTileMap);
+  }
 
   function isNotBlocked(targetNumber) {
     if (targetNumber !== 1 && targetNumber !== 2) {
@@ -120,6 +134,7 @@ function App() {
   }
 
   function Algorithm() {
+    setAlgorithmWorking(true);
     let currentPosition = startTile;
     const algorithmLoop = setInterval(() => {
       let tiles = findNeighbours(currentPosition.row, currentPosition.index);
@@ -143,18 +158,25 @@ function App() {
             }
           });
         });
+        setAlgorithmWorking(false);
         clearInterval(algorithmLoop);
       }
     }, 1000);
   }
 
   useEffect(() => {
-    Algorithm();
-  }, []);
+    GenerateTileMap(10, 15);
+  }, [])
 
   return (
     <>
       <div>
+        <h2>Current tool selected: {selectedTool}</h2>
+        <button onClick={() => setSelectedTool("empty")}>Empty</button>
+        <button onClick={() => setSelectedTool("wall")}>Wall</button>
+        <button onClick={() => setSelectedTool("start")}>Start</button>
+        <button onClick={() => setSelectedTool("goal")}>Goal</button>
+        {/* form to enter delay, rows and columns */}
         {tilesMap.map((row, rowIndex) => (
           <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
             {row.map((item, itemidx) => (
@@ -171,6 +193,9 @@ function App() {
             ))}
           </div>
         ))}
+        <button onClick={() => Algorithm()} disabled={AlgorithmWorking}>
+          Start algorithm
+        </button>
       </div>
     </>
   );
