@@ -85,7 +85,8 @@ function App() {
         [index - 1, index, index + 1].includes(tileIdx)
           ? topNeighbours.push({
               row: row - 1,
-              index: index + ([index - 1, index, index + 1].indexOf(tileIdx) - 1),
+              index:
+                index + ([index - 1, index, index + 1].indexOf(tileIdx) - 1),
               tile: tile,
             })
           : "";
@@ -97,7 +98,8 @@ function App() {
         [index - 1, index, index + 1].includes(tileIdx)
           ? bottomNeighbours.push({
               row: row + 1,
-              index: index + ([index - 1, index, index + 1].indexOf(tileIdx) - 1),
+              index:
+                index + ([index - 1, index, index + 1].indexOf(tileIdx) - 1),
               tile: tile,
             })
           : "";
@@ -138,7 +140,7 @@ function App() {
   }
 
   function Algorithm() {
-    // ! fix it looping through neighbours, eliminate neighbours from options
+    // TODO add showing the fastest path
     setAlgorithmWorking(true);
     let currentPosition = startTile;
     const algorithmLoop = setInterval(() => {
@@ -175,8 +177,24 @@ function App() {
     GenerateTileMap(rows, columns);
   }
 
+  function ClearFinished() {
+    const newTileMap = [...tilesMap];
+    let found = false;
+    newTileMap.forEach((row, rowIdx) => {
+      row.forEach((item, itemIdx) => {
+        if (item == 4) {
+          newTileMap[rowIdx][itemIdx] = 0;
+          found = true;
+        }
+      });
+    });
+    if (found) {
+      setTilesMap(newTileMap);
+    }
+  }
+
   function UpdatePosition(type, newRow, newIndex) {
-    // ! Remove all 5
+    ClearFinished();
     if (AlgorithmWorking) {
       return;
     }
@@ -199,6 +217,7 @@ function App() {
   }
 
   function HandleClick(row, index) {
+    ClearFinished();
     if (AlgorithmWorking) {
       return;
     }
@@ -222,6 +241,7 @@ function App() {
     }
     const tools = { empty: 0, wall: 1, start: 2, goal: 3 };
     if (event.buttons == 1) {
+      ClearFinished();
       if (selectedTool == "start") {
         UpdatePosition("start", row, index);
         return;
@@ -258,7 +278,7 @@ function App() {
               <div
                 key={itemidx}
                 onMouseEnter={(e) => handleHover(e, rowIndex, itemidx)}
-                onClick={(e) => HandleClick(rowIndex, itemidx)}
+                onClick={() => HandleClick(rowIndex, itemidx)}
                 style={{
                   width: width,
                   height: height,
