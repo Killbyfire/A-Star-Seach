@@ -134,6 +134,7 @@ function App() {
   }
 
   function Algorithm() {
+    // ! fix it looping through neighbours, eliminate neighbours from options
     setAlgorithmWorking(true);
     let currentPosition = startTile;
     const algorithmLoop = setInterval(() => {
@@ -171,6 +172,9 @@ function App() {
   }
 
   function UpdatePosition(type, newRow, newIndex) {
+    if (AlgorithmWorking) {
+      return;
+    }
     const tools = { start: 2, goal: 3 };
     const newTileMap = [...tilesMap];
     newTileMap.forEach((row, rowIdx) => {
@@ -190,6 +194,9 @@ function App() {
   }
 
   function HandleClick(row, index) {
+    if (AlgorithmWorking) {
+      return;
+    }
     if (selectedTool == "start") {
       UpdatePosition("start", row, index);
       return;
@@ -205,7 +212,9 @@ function App() {
   }
 
   function handleHover(event, row, index) {
-    // ? Goal and start only 1
+    if (AlgorithmWorking) {
+      return;
+    }
     const tools = { empty: 0, wall: 1, start: 2, goal: 3 };
     if (event.buttons == 1) {
       if (selectedTool == "start") {
