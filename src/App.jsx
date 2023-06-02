@@ -49,7 +49,7 @@ function App() {
   }
 
   function isNotBlocked(targetNumber) {
-    if (targetNumber !== 1 && targetNumber !== 2) {
+    if (targetNumber !== 1 && targetNumber !== 2 && targetNumber !== 5) {
       return true;
     } else {
       return false;
@@ -83,7 +83,11 @@ function App() {
     if (typeof tilesMap[row - 1] !== "undefined") {
       tilesMap[row - 1].map((tile, tileIdx) => {
         [index - 1, index, index + 1].includes(tileIdx)
-          ? topNeighbours.push({ row: index - 1, index: tileIdx, tile: tile })
+          ? topNeighbours.push({
+              row: row - 1,
+              index: index + ([index - 1, index, index + 1].indexOf(tileIdx) - 1),
+              tile: tile,
+            })
           : "";
       });
     }
@@ -92,8 +96,8 @@ function App() {
       tilesMap[row + 1].map((tile, tileIdx) => {
         [index - 1, index, index + 1].includes(tileIdx)
           ? bottomNeighbours.push({
-              row: index + 1,
-              index: tileIdx,
+              row: row + 1,
+              index: index + ([index - 1, index, index + 1].indexOf(tileIdx) - 1),
               tile: tile,
             })
           : "";
@@ -172,6 +176,7 @@ function App() {
   }
 
   function UpdatePosition(type, newRow, newIndex) {
+    // ! Remove all 5
     if (AlgorithmWorking) {
       return;
     }
