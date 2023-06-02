@@ -26,8 +26,8 @@ function App() {
   // 4 is final path
   // 5 is the path it took.
   // ? 6 is neighbour?
-  const goalTile = { row: 1, index: 0 };
-  const startTile = { row: 4, index: 4 };
+  const [startTile, setStartTile] = useState({ row: 4, index: 4 });
+  const [goalTile, setGoalTile] = useState({ row: 1, index: 0 });
   const [tilesMap, setTilesMap] = useState([
     [0, 0, 0, 0, 0],
     [3, 0, 0, 0, 0],
@@ -164,9 +164,67 @@ function App() {
     }, 1000);
   }
 
+  function clearTileMap() {
+    const rows = tilesMap.length;
+    const columns = tilesMap[0].length;
+    GenerateTileMap(rows, columns);
+  }
+
+  function UpdatePosition(type, newRow, newIndex) {
+    const tools = { start: 2, goal: 3 };
+    const newTileMap = [...tilesMap];
+    newTileMap.forEach((row, rowIdx) => {
+      row.forEach((item, itemIdx) => {
+        if (item == tools[type]) {
+          newTileMap[rowIdx][itemIdx] = 0;
+        }
+      });
+    });
+    newTileMap[newRow][newIndex] = tools[type];
+    if (type == "start") {
+      setStartTile({ row: newRow, index: newIndex });
+    } else {
+      setGoalTile({ row: newRow, index: newIndex });
+    }
+    setTilesMap(newTileMap);
+  }
+
+  function HandleClick(row, index) {
+    if (selectedTool == "start") {
+      UpdatePosition("start", row, index);
+      return;
+    }
+    if (selectedTool == "goal") {
+      UpdatePosition("goal", row, index);
+      return;
+    }
+    const tools = { empty: 0, wall: 1, start: 2, goal: 3 };
+    const newTileMap = [...tilesMap];
+    newTileMap[row][index] = tools[selectedTool];
+    setTilesMap(newTileMap);
+  }
+
+  function handleHover(event, row, index) {
+    // ? Goal and start only 1
+    const tools = { empty: 0, wall: 1, start: 2, goal: 3 };
+    if (event.buttons == 1) {
+      if (selectedTool == "start") {
+        UpdatePosition("start", row, index);
+        return;
+      }
+      if (selectedTool == "goal") {
+        UpdatePosition("goal", row, index);
+        return;
+      }
+      const newTileMap = [...tilesMap];
+      newTileMap[row][index] = tools[selectedTool];
+      setTilesMap(newTileMap);
+    }
+  }
+
   useEffect(() => {
     GenerateTileMap(10, 15);
-  }, [])
+  }, []);
 
   return (
     <>
@@ -176,12 +234,17 @@ function App() {
         <button onClick={() => setSelectedTool("wall")}>Wall</button>
         <button onClick={() => setSelectedTool("start")}>Start</button>
         <button onClick={() => setSelectedTool("goal")}>Goal</button>
+        <br />
+        <br />
+        <button onClick={() => clearTileMap()}>Clear all</button>
         {/* form to enter delay, rows and columns */}
         {tilesMap.map((row, rowIndex) => (
           <div key={rowIndex} style={{ display: "flex", flexDirection: "row" }}>
             {row.map((item, itemidx) => (
               <div
                 key={itemidx}
+                onMouseEnter={(e) => handleHover(e, rowIndex, itemidx)}
+                onClick={(e) => HandleClick(rowIndex, itemidx)}
                 style={{
                   width: width,
                   height: height,
