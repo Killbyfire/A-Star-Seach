@@ -141,6 +141,9 @@ function App() {
 
   function Algorithm() {
     // TODO add showing the fastest path
+
+    // !
+    // ? Keep a list of neighbours so it checks all nodes neighbours and not just one node
     setAlgorithmWorking(true);
     let currentPosition = startTile;
     const algorithmLoop = setInterval(() => {
@@ -150,6 +153,7 @@ function App() {
       });
       let lowestTileCost = Math.min(...tileCosts);
       let lowestTile = tiles[tileCosts.indexOf(lowestTileCost)];
+      console.log(lowestTile);
       currentPosition = { row: lowestTile.row, index: lowestTile.index };
       const newTileMap = [...tilesMap];
       newTileMap[lowestTile.row][lowestTile.index] = 5;
@@ -168,7 +172,65 @@ function App() {
         setAlgorithmWorking(false);
         clearInterval(algorithmLoop);
       }
-    }, 1000);
+    }, 5000);
+  }
+
+  function getLowestValues(values) {
+    const min = Math.min(...values);
+    const lowestValues = [];
+
+    values.map((value) => {
+      if (value === min) {
+        lowestValues.push(value)
+      }
+    })
+
+    return lowestValues;
+  }
+
+  function AlgorithmRewrite() {
+    const allNeighbours = [];
+    // Get all neighbours and add to allNeighbours,
+    // ! Get ALL lowest values and sort on H cost
+    // ? loop over all neighbours and update ones
+    setAlgorithmWorking(true);
+    let currentPosition = startTile;
+    const algorithmLoop = setInterval(() => {
+      let tiles = findNeighbours(currentPosition.row, currentPosition.index);
+      allNeighbours.push(...tiles);
+      let tileCosts = allNeighbours.map((tile) => {
+        return tile.f;
+      });
+      let lowestTiles = getLowestValues(tileCosts); // List of lowest values
+      let lowestTile = lowestTiles[0];
+      if (lowestTiles.length > 1) {
+        let lowestTileHCost = 0;
+        lowestTiles.map((lTile, lTileIdx) => {
+          if (lTile.h > lowestTileHCost) {
+            lowestTileHCost = lTile.h;
+            lowestTile = lowestTiles[lTileIdx]
+          }
+        })
+      }
+      currentPosition = { row: lowestTile.row, index: lowestTile.index };
+      const newTileMap = [...tilesMap];
+      newTileMap[lowestTile.row][lowestTile.index] = 5;
+      setTilesMap(newTileMap);
+      if (
+        currentPosition.row == goalTile.row &&
+        currentPosition.index == goalTile.index
+      ) {
+        tilesMap.map((tileRow, RowIndex) => {
+          tileRow.map((tile, idx) => {
+            if (tile == 5) {
+              tilesMap[RowIndex][idx] = 4;
+            }
+          });
+        });
+        setAlgorithmWorking(false);
+        clearInterval(algorithmLoop);
+      }
+    }, 5000);
   }
 
   function clearTileMap() {
